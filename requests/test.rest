@@ -1,0 +1,14 @@
+
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+//Content-Type 头需要单独一行，且与 JSON 数据之间应有空行。
+{
+  "title": "Blog2",
+  "author": "man",
+  "url": "http://manba.com",
+  "likes": 666
+}
+
+###
+
+GET http://localhost:3003/api/blogs
