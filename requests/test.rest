@@ -1,14 +1,44 @@
 
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization:Bearer 
 //Content-Type 头需要单独一行，且与 JSON 数据之间应有空行。
+
 {
-  "title": "Blog2",
-  "author": "man",
-  "url": "http://manba.com",
-  "likes": 666
+  "title": "A Great Blog Post",
+  "author": "Jane Doe",
+  "url": "https://example.com/great-blog-post",
+  "likes": 10
 }
+
 
 ###
 
 GET http://localhost:3003/api/blogs
+Authorization:Bearer
+
+### 
+POST http://localhost:3003/api/users
+Content-Type: application/json
+//Content-Type 头需要单独一行，且与 JSON 数据之间应有空行。
+
+{
+  "username": "User1",
+  "name": "Example User1",
+  "password": "hashedPassword"
+}
+
+
+###
+GET http://localhost:3003/api/users
+
+###
+POST http://localhost:3003/api/login
+Content-Type: application/json
+//登录
+
+{
+  "username": "User1",
+  "password": "hashedPassword"
+}
+
