@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
+import BlogForm from './components/BlogForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -10,19 +12,7 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
-  const [newBlog, setNewBlog] = useState({
-    title: '',
-    author: '',
-    url: ''
-  })
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target
-    setNewBlog({
-      ...newBlog,
-      [name]: value
-    })
-  }
 
   // 处理登录表单的提交
   const handleLogin = async (event) => {
@@ -67,20 +57,7 @@ const App = () => {
     setUser(null)
   }
 
-  const handleNewBlog = async (event) => {
-    event.preventDefault()
-    try {
-      const returnedBlog = await blogService.create(newBlog)
-      setBlogs(blogs.concat(returnedBlog))
-      setNewBlog({
-        title: '',
-        author: '',
-        url: ''
-      })
-    } catch (error) {
-      console.log(error)
-    }
-  }
+
 
   const loginForm = () => (
     <form onSubmit={handleLogin}>
@@ -107,39 +84,25 @@ const App = () => {
     </form>
   )
 
-  const blogForm = () => (
-    <form onSubmit={handleNewBlog}>
-      <div>
-        <h2>create new</h2>
-        title
-        <input
-          type="text"
-          value={newBlog.title}
-          name="title"
-          onChange={handleInputChange}
-        />
-      </div>
-      <div>
-        author
-        <input
-          type="text"
-          value={newBlog.author}
-          name="author"
-          onChange={handleInputChange}
-        />
-      </div>
-      <div>
-        url
-        <input
-          type="text"
-          value={newBlog.url}
-          name="url"
-          onChange={handleInputChange}
-        />
-      </div>
-      <button type="submit">create</button>
-    </form>
-  )
+
+
+  const createBlog = async (blogObject) => {
+    try {
+      blogFormRef.current.toggleVisibility()
+      const returnedBlog = await blogService.create(blogObject)
+      setBlogs(blogs.concat(returnedBlog))
+      setErrorMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    } catch (error) {
+      setErrorMessage('Failed to add blog')
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
+  const blogFormRef = useRef()
 
   return (
     <div>
@@ -150,7 +113,12 @@ const App = () => {
           <p>{user.name} logged-in<button id='logout' onClick={handleLogout}>logout</button></p>
         </div>
       }
-      {blogForm()}
+      <Togglable buttonLabel="Add new blog" ref={blogFormRef}>
+        <BlogForm
+          createBlog={createBlog}
+        />
+      </Togglable>
+
       <h2>blogs</h2>
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
@@ -160,8 +128,6 @@ const App = () => {
 }
 
 export default App
-
-
 
 
 
